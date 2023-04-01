@@ -100,9 +100,36 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 		}
 	}
 
+	
+	@Override
+	public void mousePressed(MouseEvent e) {
+		mousePressed = true;
+		// Draws a single circle when clicked for full action of mouse
+		g2d.setPaint(colorChooser.getColor());
+		g2d.fillOval(mousePosition.x - 13, mousePosition.y - 36, 15, 15);
+		getContentPane().repaint();
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		mousePressed = false;
+	}
+	
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		mousePosition = new Point(e.getX(), e.getY());
+	}
+	
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
 	}
 
 	public void saveCanvas() {
@@ -163,29 +190,4 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 		}
 	}
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-		mousePressed = true;
-		// Draws a single circle when clicked for full action of mouse
-		g2d.setPaint(colorChooser.getColor());
-		g2d.fillOval(mousePosition.x - 13, mousePosition.y - 36, 15, 15);
-		getContentPane().repaint();
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		mousePressed = false;
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
-	}
 }
