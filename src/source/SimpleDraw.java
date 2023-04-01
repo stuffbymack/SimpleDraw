@@ -1,6 +1,7 @@
 package source;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -15,28 +16,29 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 	private JButton saveButton;
 	private JButton clearButton;
 	private JButton colorButton;
+	private MinimalColorChooser colorChooser;
+	private JDialog colorDialog;
 	private Point mousePosition;
 	private static final String NAME = "SimpleDraw";
 	private static final String SAVE = "Save";
 	private static final String CLEAR = "Clear";
 	private static final String COLOR = "Color";
+	private static final String PALETTE = "Palette";
 
 	public SimpleDraw() {
 		super(NAME);
-		// Not resize-able, will break drawing if resized at the moment.
+		colorChooser = new MinimalColorChooser(Color.BLACK);
+        colorChooser.setPreviewPanel(new JPanel()); // disable the preview panel
+        colorDialog = new JDialog();
+        colorDialog.add(colorChooser);
+        colorDialog.pack();
+        colorDialog.setResizable(false);
+        colorDialog.setTitle(PALETTE);
+
+        // Not resize-able, will break drawing if resized at the moment.
 		setResizable(false);
 		// Attempt to mimic the system look and feel
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
+		updateLookAndFeel();
 		// Build 2d canvas object in JFrame
 		canvas = new BufferedImage(512, 512, BufferedImage.TYPE_INT_ARGB);
 		g2d = canvas.createGraphics();
@@ -65,7 +67,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 		addMouseMotionListener(this);
 		setSize(512, 564);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//Sets the window to be center screen
+		// Sets the window to be center screen
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
@@ -77,17 +79,18 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 		} else if (e.getSource() == clearButton) {
 			clearCanvas();
 		} else if (e.getSource() == colorButton) {
-			chooseColor();
+			openColorWindow();
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (mousePosition != null) {
+			// This can be better, it gets the color every drag event
+			g2d.setPaint(colorChooser.getColor());
 			int x = e.getX();
 			int y = e.getY();
 			// TODO Fix this bad fix for brush/mouse offset
-			// the "- 16" fixes some inherent offset from the JFrame boiler itself, will break if window is resized.
 			g2d.drawLine(mousePosition.x, mousePosition.y - 16, x, y - 16);
 			mousePosition = new Point(x, y);
 			getContentPane().repaint();
@@ -98,9 +101,8 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 	public void mouseMoved(MouseEvent e) {
 		mousePosition = new Point(e.getX(), e.getY());
 	}
-	
 
-	public void saveCanvas () {
+	public void saveCanvas() {
 		try {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setCurrentDirectory(chooser.getFileSystemView().getDefaultDirectory());
@@ -116,8 +118,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 			ex.printStackTrace();
 		}
 	}
-	
-	
+
 	public void clearCanvas() {
 		g2d.setPaint(Color.WHITE);
 		g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -125,9 +126,34 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 		getContentPane().repaint();
 	}
 	
-	public void chooseColor() {
-		Color initialcolor = g2d.getColor();    
-    	Color color = JColorChooser.showDialog(this,COLOR,initialcolor);
-    	g2d.setPaint(color);  
+	public void colorCanvas() {
+		g2d.setPaint(colorChooser.getColor());
+		g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		g2d.setPaint(Color.BLACK);
+		getContentPane().repaint();
+	}
+
+	public void openColorWindow() {
+        if (!colorDialog.isVisible()) {
+		colorDialog.setVisible(true);
+        colorDialog.setLocationRelativeTo(this);
+        } else {
+        	colorDialog.requestFocus();
+        }
+        
+	}
+	
+	public void updateLookAndFeel() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
 	}
 }
