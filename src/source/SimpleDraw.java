@@ -9,7 +9,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
-public class SimpleDraw extends JFrame implements MouseMotionListener, ActionListener {
+public class SimpleDraw extends JFrame implements MouseMotionListener, MouseListener, ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private BufferedImage canvas;
@@ -20,6 +20,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 	private MinimalColorChooser colorChooser;
 	private JDialog colorDialog;
 	private Point mousePosition;
+	private boolean mousePressed;
 	private static final String NAME = "SimpleDraw";
 	private static final String SAVE = "Save";
 	private static final String CLEAR = "Clear";
@@ -28,13 +29,13 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 	public SimpleDraw() {
 		super(NAME);
 		colorChooser = new MinimalColorChooser(Color.BLACK);
-        colorChooser.setPreviewPanel(new JPanel()); // disable the preview panel
-        colorDialog = new JDialog();
-        colorDialog.add(colorChooser);
-        colorDialog.pack();
-        colorDialog.setResizable(false);
-        colorDialog.setTitle(PALETTE);
-        // Not resize-able, will break drawing if resized at the moment.
+		colorChooser.setPreviewPanel(new JPanel()); // disable the preview panel
+		colorDialog = new JDialog();
+		colorDialog.add(colorChooser);
+		colorDialog.pack();
+		colorDialog.setResizable(false);
+		colorDialog.setTitle(PALETTE);
+		// Not resize-able, will break drawing if resized at the moment.
 		setResizable(false);
 		// Attempt to mimic the system look and feel
 		updateLookAndFeel();
@@ -64,6 +65,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 		colorButton.addActionListener(this);
 		// JFrame parameters
 		addMouseMotionListener(this);
+		addMouseListener(this);
 		setSize(524, 584);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// Sets the window to be center screen
@@ -84,7 +86,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (mousePosition != null) {
+		if (mousePosition != null && mousePressed) {
 			// This can be better, it gets the color every drag event
 			g2d.setPaint(colorChooser.getColor());
 			int x = e.getX();
@@ -126,7 +128,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 		g2d.setPaint(Color.BLACK);
 		getContentPane().repaint();
 	}
-	
+
 	public void colorCanvas() {
 		g2d.setPaint(colorChooser.getColor());
 		g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -135,19 +137,18 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 	}
 
 	public void openColorWindow() {
-        if (!colorDialog.isVisible()) {
-        colorDialog.setLocationRelativeTo(this);
-        int offsetX = 120;
-        int offsetY = 600;
-        Point referenceLocation = this.getLocationOnScreen();
-        colorDialog.setLocation(referenceLocation.x + offsetX, referenceLocation.y + offsetY);
-        colorDialog.setVisible(true);
-        } else {
-        	colorDialog.requestFocus();
-        }
-        
+		if (!colorDialog.isVisible()) {
+			colorDialog.setLocationRelativeTo(this);
+			int offsetX = 120;
+			int offsetY = 600;
+			Point referenceLocation = this.getLocationOnScreen();
+			colorDialog.setLocation(referenceLocation.x + offsetX, referenceLocation.y + offsetY);
+			colorDialog.setVisible(true);
+		} else {
+			colorDialog.requestFocus();
+		}
 	}
-	
+
 	public void updateLookAndFeel() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -160,5 +161,31 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		mousePressed = true;
+		// Draws a single circle when clicked for full action of mouse
+		g2d.setPaint(colorChooser.getColor());
+		g2d.fillOval(mousePosition.x - 13, mousePosition.y - 36, 15, 15);
+		getContentPane().repaint();
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		mousePressed = false;
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
 	}
 }
