@@ -28,8 +28,9 @@ public class SimpleDraw extends JFrame implements MouseListener, MouseMotionList
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBackground(Color.WHITE);
 
+        // Panel for drawing canvas
         canvas = new JPanel() {
-			private static final long serialVersionUID = 1L;
+			private static final long serialVersionUID = 2L;
 			public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (bufferImage != null) {
@@ -41,11 +42,15 @@ public class SimpleDraw extends JFrame implements MouseListener, MouseMotionList
         canvas.addMouseMotionListener(this);
         add(canvas);
 
+        // Panel just for buttons
         buttonPanel = new JPanel(new BorderLayout());
+        
+        // Clear button created for erasing the canvas
         clearButton = new JButton("Clear");
         clearButton.addActionListener(e -> clearCanvas());
         buttonPanel.add(clearButton, BorderLayout.NORTH);
 
+        // Save button added for exporting the canvas
         saveButton = new JButton("Save");
         saveButton.addActionListener(e -> saveCanvas());
         buttonPanel.add(saveButton, BorderLayout.SOUTH);
@@ -104,11 +109,9 @@ public class SimpleDraw extends JFrame implements MouseListener, MouseMotionList
         bufferGraphics.fillOval(x2 - brushSize / 2, y2 - brushSize / 2, brushSize, brushSize);
         canvas.getGraphics().drawImage(bufferImage, 0, 0, null);
     }
-
-    public void actionPerformed(ActionEvent e) {
-       
-    }
-
+    
+    // Useless methods needed for implementation.
+    public void actionPerformed(ActionEvent e) {}
     public void mouseMoved(MouseEvent e) {}
     public void mouseEntered(MouseEvent e) {}
     public void mouseExited(MouseEvent e) {}
