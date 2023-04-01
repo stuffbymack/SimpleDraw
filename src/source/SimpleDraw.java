@@ -22,7 +22,6 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 	private static final String NAME = "SimpleDraw";
 	private static final String SAVE = "Save";
 	private static final String CLEAR = "Clear";
-	private static final String COLOR = "Color";
 	private static final String PALETTE = "Palette";
 
 	public SimpleDraw() {
@@ -53,7 +52,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 		JPanel buttonPanel = new JPanel(new FlowLayout());
 		saveButton = new JButton(SAVE);
 		clearButton = new JButton(CLEAR);
-		colorButton = new JButton(COLOR);
+		colorButton = new JButton(PALETTE);
 		buttonPanel.add(saveButton);
 		buttonPanel.add(colorButton);
 		buttonPanel.add(clearButton);
