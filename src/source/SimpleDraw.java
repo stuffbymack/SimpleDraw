@@ -33,7 +33,6 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
         colorDialog.pack();
         colorDialog.setResizable(false);
         colorDialog.setTitle(PALETTE);
-
         // Not resize-able, will break drawing if resized at the moment.
 		setResizable(false);
 		// Attempt to mimic the system look and feel
@@ -64,7 +63,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 		colorButton.addActionListener(this);
 		// JFrame parameters
 		addMouseMotionListener(this);
-		setSize(512, 564);
+		setSize(524, 584);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// Sets the window to be center screen
 		setLocationRelativeTo(null);
@@ -90,7 +89,9 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 			int x = e.getX();
 			int y = e.getY();
 			// TODO Fix this bad fix for brush/mouse offset
-			g2d.drawLine(mousePosition.x, mousePosition.y - 16, x, y - 16);
+			// 29 = (584 - 512) / 2 - (Brush / 2)
+			// 8 = 524 - 512
+			g2d.drawLine(mousePosition.x - 8, mousePosition.y - 29, x - 8, y - 29);
 			mousePosition = new Point(x, y);
 			getContentPane().repaint();
 		}
