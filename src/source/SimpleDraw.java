@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+
 import javax.imageio.ImageIO;
 
 public class SimpleDraw extends JFrame implements MouseMotionListener, ActionListener {
@@ -90,8 +91,8 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 			int y = e.getY();
 			// TODO Fix this bad fix for brush/mouse offset
 			// 29 = (584 - 512) / 2 - (Brush / 2)
-			// 8 = 524 - 512
-			g2d.drawLine(mousePosition.x - 8, mousePosition.y - 29, x - 8, y - 29);
+			// 6 = ?
+			g2d.drawLine(mousePosition.x - 6, mousePosition.y - 29, x - 6, y - 29);
 			mousePosition = new Point(x, y);
 			getContentPane().repaint();
 		}
@@ -135,8 +136,12 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
 
 	public void openColorWindow() {
         if (!colorDialog.isVisible()) {
-		colorDialog.setVisible(true);
         colorDialog.setLocationRelativeTo(this);
+        int offsetX = 120;
+        int offsetY = 600;
+        Point referenceLocation = this.getLocationOnScreen();
+        colorDialog.setLocation(referenceLocation.x + offsetX, referenceLocation.y + offsetY);
+        colorDialog.setVisible(true);
         } else {
         	colorDialog.requestFocus();
         }
