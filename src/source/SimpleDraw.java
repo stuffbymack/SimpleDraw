@@ -14,12 +14,28 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
     private Graphics2D g2d;
     private JButton saveButton;
     private JButton clearButton;
+    private JButton colorButton;
     private Point mousePosition;
     
     public SimpleDraw() {
         super("SimpleDraw");
         setResizable(false);
         setLocation(700, 250);
+        try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         canvas = new BufferedImage(512, 512, BufferedImage.TYPE_INT_ARGB);
         g2d = canvas.createGraphics();
@@ -35,8 +51,10 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
         JPanel buttonPanel = new JPanel(new FlowLayout());
         saveButton = new JButton("Save");
         clearButton = new JButton("Clear");
+        colorButton = new JButton("Color");
         buttonPanel.add(saveButton);
         buttonPanel.add(clearButton);
+        buttonPanel.add(colorButton);
         
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(new JLabel(new ImageIcon(canvas)), BorderLayout.CENTER);
@@ -44,6 +62,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
         
         saveButton.addActionListener(this);
         clearButton.addActionListener(this);
+        colorButton.addActionListener(this);
         addMouseMotionListener(this);
         
         setSize(512, 564);
@@ -72,11 +91,15 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, ActionLis
             g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
             g2d.setPaint(Color.BLACK);
             getContentPane().repaint();
-        }
+        } else if (e.getSource() == colorButton) {
+        	Color initialcolor= g2d.getColor();    
+        	Color color= JColorChooser.showDialog(this,"Select a color",initialcolor);    
+        	g2d.setPaint(color);    
+        }  
     }
     
     public void mouseDragged(MouseEvent e) {
-        if (mousePosition != null) {
+    	if (mousePosition != null) {
             int x = e.getX();
             int y = e.getY();
             g2d.drawLine(mousePosition.x, mousePosition.y - 16, x, y -16);
