@@ -61,7 +61,16 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 		getContentPane().add(new JLabel(new ImageIcon(canvas)), BorderLayout.CENTER);
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		saveButton.addActionListener(this);
-		clearButton.addActionListener(this);
+		//Extra clear button magic for right click fill with color behavior
+		clearButton.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    clearCanvas();
+                } else if (SwingUtilities.isRightMouseButton(e)) {
+                	colorCanvas();
+                }
+            }
+        });
 		colorButton.addActionListener(this);
 		// JFrame parameters
 		addMouseMotionListener(this);
@@ -75,10 +84,9 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		//The clear button is not handled here because it has added functionality for left/right click
 		if (e.getSource() == saveButton) {
 			saveCanvas();
-		} else if (e.getSource() == clearButton) {
-			clearCanvas();
 		} else if (e.getSource() == colorButton) {
 			openColorWindow();
 		}
@@ -132,22 +140,25 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	public void mouseClicked(MouseEvent arg0) {
 	}
 
-	public void saveCanvas() {
-		try {
-			JFileChooser chooser = new JFileChooser();
-			chooser.setCurrentDirectory(chooser.getFileSystemView().getDefaultDirectory());
-			int result = chooser.showSaveDialog(this);
-			if (result == JFileChooser.APPROVE_OPTION) {
-				String filePath = chooser.getSelectedFile().getPath();
-				if (!filePath.endsWith(".png")) {
-					filePath += ".png";
-				}
-				ImageIO.write(canvas, "png", new File(filePath));
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
+	private String lastSavedFilePath = System.getProperty("user.dir");
+
+    public void saveCanvas() {
+        try {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setCurrentDirectory(new File(lastSavedFilePath));
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                String filePath = chooser.getSelectedFile().getPath();
+                if (!filePath.endsWith(".png")) {
+                    filePath += ".png";
+                }
+                ImageIO.write(canvas, "png", new File(filePath));
+                lastSavedFilePath = filePath;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
 	public void clearCanvas() {
 		g2d.setPaint(Color.WHITE);
