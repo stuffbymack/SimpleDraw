@@ -40,6 +40,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	private Point mousePosition;
 	private boolean mousePressed;
 	private JPanel buttonPanel;
+	private JLabel labelPanel;
 	private static final String FRAME_NAME = "SimpleDraw";
 	private static final String SAVE_BUTTON = "Save";
 	private static final String CLEAR_BUTTON = "Clear";
@@ -51,11 +52,11 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 		super(FRAME_NAME);
 		setupColorChooser();
 		setupColorDialog();
-		setupResizable();
 		setupLookAndFeel();
 		setupCanvas();
 		setupGraphics();
 		setupButtons();
+		setupLabel();
 		setupContentPane();
 		setupListeners();
 		setupJFrame();
@@ -72,10 +73,6 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 		colorDialog.pack();
 		colorDialog.setResizable(false);
 		colorDialog.setTitle(PALETTE_BUTTON);
-	}
-
-	private void setupResizable() {
-		setResizable(false);
 	}
 
 	private void setupLookAndFeel() {
@@ -127,10 +124,14 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 			}
 		});
 	}
+	
+	private void setupLabel() {
+		labelPanel = new JLabel(new ImageIcon(canvas));
+	}
 
 	private void setupContentPane() {
 		getContentPane().setLayout(new BorderLayout());
-		getContentPane().add(new JLabel(new ImageIcon(canvas)), BorderLayout.CENTER);
+		getContentPane().add(labelPanel, BorderLayout.CENTER);
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 	}
 
@@ -154,31 +155,28 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 			openColorWindow();
 		}
 	}
-	
-	//Starts drawing the initial dot when clicked.
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 		mousePressed = true;
 		graphics.setPaint(colorChooser.getColor());
-		// TODO fix static offsets in the line below to account for jframe and
-		// graphics2d being different sizes, works fine atm due to fixed window size.
-		graphics.fillOval(mousePosition.x - 13, mousePosition.y - 36, BRUSH_SIZE, BRUSH_SIZE);
-		getContentPane().repaint();
+		int offsetY = ((this.getHeight() - CANVAS_SIZE) / 2) + 7;
+		int offsetX = ((this.getWidth() - CANVAS_SIZE) / 2) + 7;
+		graphics.fillOval(mousePosition.x - offsetX, mousePosition.y - offsetY, BRUSH_SIZE, BRUSH_SIZE);
+		labelPanel.repaint();
 	}
 
-	//Draws the actual line when dragged.
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (mousePosition != null && mousePressed) {
 			graphics.setPaint(colorChooser.getColor());
 			int x = e.getX();
 			int y = e.getY();
-			// TODO fix static offsets in the line below to account for jframe and
-			// graphics2d being different sizes, works fine atm due to fixed window size.
-			// (584 - 512) / 2 - (Brush / 2) = 29?
-			graphics.drawLine(mousePosition.x - 6, mousePosition.y - 29, x - 6, y - 29);
+			int offsetY = (this.getHeight() - CANVAS_SIZE) / 2;
+			int offsetX = (this.getWidth() - CANVAS_SIZE) / 2;
+			graphics.drawLine(mousePosition.x - offsetX, mousePosition.y - offsetY, x - offsetX, y - offsetY);
 			mousePosition = new Point(x, y);
-			getContentPane().repaint();
+			labelPanel.repaint();
 		}
 	}
 
@@ -235,25 +233,28 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	public void clearCanvas() {
 		graphics.setPaint(Color.WHITE);
 		graphics.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		getContentPane().repaint();
+		labelPanel.repaint();
 	}
 
 	public void colorCanvas() {
 		graphics.setPaint(colorChooser.getColor());
 		graphics.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		getContentPane().repaint();
+		labelPanel.repaint();
 	}
 
 	public void openColorWindow() {
 		if (!colorDialog.isVisible()) {
-			colorDialog.setLocationRelativeTo(this);
-			int offsetX = 120;
-			int offsetY = 600;
+			int offsetX = (this.getWidth() / 2) - (colorDialog.getWidth() / 2);
+			int offsetY = (this.getHeight() + 24);
+			if (this.getHeight() > 800){
+				offsetY = (this.getHeight() / 2);
+			}
 			Point referenceLocation = this.getLocationOnScreen();
 			colorDialog.setLocation(referenceLocation.x + offsetX, referenceLocation.y + offsetY);
 			colorDialog.setVisible(true);
 		} else {
 			colorDialog.requestFocus();
 		}
+		
 	}
 }
