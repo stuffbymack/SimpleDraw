@@ -117,6 +117,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 		colorButton.addActionListener(this);
 		clearButton.addMouseListener(new MouseAdapter() {
 
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					clearCanvas();
@@ -153,24 +154,28 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 			openColorWindow();
 		}
 	}
-
+	
+	//Starts drawing the initial dot when clicked.
 	@Override
 	public void mousePressed(MouseEvent e) {
 		mousePressed = true;
 		graphics.setPaint(colorChooser.getColor());
+		// TODO fix static offsets in the line below to account for jframe and
+		// graphics2d being different sizes, works fine atm due to fixed window size.
 		graphics.fillOval(mousePosition.x - 13, mousePosition.y - 36, BRUSH_SIZE, BRUSH_SIZE);
 		getContentPane().repaint();
 	}
 
+	//Draws the actual line when dragged.
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (mousePosition != null && mousePressed) {
 			graphics.setPaint(colorChooser.getColor());
 			int x = e.getX();
 			int y = e.getY();
-			// TODO Fix this bad fix for brush/mouse offset
-			// 29 = (584 - 512) / 2 - (Brush / 2)
-			// 6 = ?
+			// TODO fix static offsets in the line below to account for jframe and
+			// graphics2d being different sizes, works fine atm due to fixed window size.
+			// (584 - 512) / 2 - (Brush / 2) = 29?
 			graphics.drawLine(mousePosition.x - 6, mousePosition.y - 29, x - 6, y - 29);
 			mousePosition = new Point(x, y);
 			getContentPane().repaint();
