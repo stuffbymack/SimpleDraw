@@ -128,7 +128,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	}
 
 	private void setupJFrame() {
-		setSize(524, 584);
+		setSize(640, 672);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setVisible(true);
