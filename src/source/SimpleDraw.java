@@ -15,6 +15,7 @@
  */
 package source;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.*;
@@ -25,8 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
 public class SimpleDraw extends JFrame implements MouseMotionListener, MouseListener, ActionListener {
 
 	private static final long serialVersionUID = 1L;
@@ -34,9 +33,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	private Graphics2D graphics;
 	private JButton saveButton;
 	private JButton clearButton;
-	private JButton colorButton;
 	private MinimalColorChooser colorChooser;
-	private JDialog colorDialog;
 	private Point mousePosition;
 	private boolean mousePressed;
 	private JPanel buttonPanel;
@@ -44,14 +41,12 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	private static final String FRAME_NAME = "SimpleDraw";
 	private static final String SAVE_BUTTON = "Save";
 	private static final String CLEAR_BUTTON = "Clear";
-	private static final String PALETTE_BUTTON = "Palette";
 	private static final int CANVAS_SIZE = 512;
 	private static final int BRUSH_SIZE = 15;
 
 	public SimpleDraw() {
 		super(FRAME_NAME);
 		setupColorChooser();
-		setupColorDialog();
 		setupLookAndFeel();
 		setupCanvas();
 		setupGraphics();
@@ -67,24 +62,11 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 		colorChooser.setPreviewPanel(new JPanel());
 	}
 
-	private void setupColorDialog() {
-		colorDialog = new JDialog();
-		colorDialog.add(colorChooser);
-		colorDialog.pack();
-		colorDialog.setResizable(false);
-		colorDialog.setTitle(PALETTE_BUTTON);
-	}
-
 	private void setupLookAndFeel() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
 	}
@@ -105,13 +87,10 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	private void setupButtons() {
 		saveButton = new JButton(SAVE_BUTTON);
 		clearButton = new JButton(CLEAR_BUTTON);
-		colorButton = new JButton(PALETTE_BUTTON);
 		buttonPanel = new JPanel(new FlowLayout());
 		buttonPanel.add(saveButton);
-		buttonPanel.add(colorButton);
 		buttonPanel.add(clearButton);
 		saveButton.addActionListener(this);
-		colorButton.addActionListener(this);
 		clearButton.addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -124,7 +103,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 			}
 		});
 	}
-	
+
 	private void setupLabel() {
 		labelPanel = new JLabel(new ImageIcon(canvas));
 	}
@@ -132,7 +111,15 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	private void setupContentPane() {
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(labelPanel, BorderLayout.CENTER);
-		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+		// Create a panel for the color chooser
+		JPanel colorPanel = new JPanel(new BorderLayout());
+		colorPanel.add(colorChooser, BorderLayout.NORTH);
+		// Add the button panel and color panel to the main panel
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		mainPanel.add(buttonPanel, BorderLayout.NORTH);
+		mainPanel.add(colorPanel, BorderLayout.SOUTH);
+		// Add the main panel to the content pane
+		getContentPane().add(mainPanel, BorderLayout.SOUTH);
 	}
 
 	private void setupListeners() {
@@ -151,8 +138,6 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == saveButton) {
 			saveCanvas();
-		} else if (e.getSource() == colorButton) {
-			openColorWindow();
 		}
 	}
 
@@ -160,7 +145,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 	public void mousePressed(MouseEvent e) {
 		mousePressed = true;
 		graphics.setPaint(colorChooser.getColor());
-		int offsetY = ((this.getHeight() - CANVAS_SIZE) / 2) + 7;
+		int offsetY = ((this.getHeight() - CANVAS_SIZE) / 2) - 39;
 		int offsetX = ((this.getWidth() - CANVAS_SIZE) / 2) + 7;
 		graphics.fillOval(mousePosition.x - offsetX, mousePosition.y - offsetY, BRUSH_SIZE, BRUSH_SIZE);
 		labelPanel.repaint();
@@ -172,7 +157,7 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 			graphics.setPaint(colorChooser.getColor());
 			int x = e.getX();
 			int y = e.getY();
-			int offsetY = (this.getHeight() - CANVAS_SIZE) / 2;
+			int offsetY = ((this.getHeight() - CANVAS_SIZE) / 2) - 46;
 			int offsetX = (this.getWidth() - CANVAS_SIZE) / 2;
 			graphics.drawLine(mousePosition.x - offsetX, mousePosition.y - offsetY, x - offsetX, y - offsetY);
 			mousePosition = new Point(x, y);
@@ -240,21 +225,5 @@ public class SimpleDraw extends JFrame implements MouseMotionListener, MouseList
 		graphics.setPaint(colorChooser.getColor());
 		graphics.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		labelPanel.repaint();
-	}
-
-	public void openColorWindow() {
-		if (!colorDialog.isVisible()) {
-			int offsetX = (this.getWidth() / 2) - (colorDialog.getWidth() / 2);
-			int offsetY = (this.getHeight() + 24);
-			if (this.getHeight() > 800){
-				offsetY = (this.getHeight() / 2);
-			}
-			Point referenceLocation = this.getLocationOnScreen();
-			colorDialog.setLocation(referenceLocation.x + offsetX, referenceLocation.y + offsetY);
-			colorDialog.setVisible(true);
-		} else {
-			colorDialog.requestFocus();
-		}
-		
 	}
 }

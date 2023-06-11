@@ -63,16 +63,18 @@ public class MinimalColorChooser extends JColorChooser {
 		private static final long serialVersionUID = 1L;
 
 		public void buildChooser() {
-			JPanel panel = new JPanel(new GridLayout(2, 14, 2, 2));
-			for (Color color : COLORS) {
-				JButton button = new JButton();
-				button.setBackground(color);
-				button.setPreferredSize(new Dimension(16, 16));
-				button.addActionListener(e -> getColorSelectionModel().setSelectedColor(color));
-				panel.add(button);
-			}
-			add(panel);
+		    JPanel panel = new JPanel(new GridLayout(2, 14, 0, 0));
+		    for (Color color : COLORS) {
+		        JButton button = new JButton();
+		        button.setBackground(color);
+		        button.setPreferredSize(new Dimension(36, 36));
+		        button.setBorder(BorderFactory.createEmptyBorder()); // Remove the border
+		        button.addActionListener(e -> getColorSelectionModel().setSelectedColor(color));
+		        panel.add(button);
+		    }
+		    add(panel);
 		}
+
 
 		public String getDisplayName() {
 			return FRAME_NAME;
